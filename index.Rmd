@@ -1,0 +1,34 @@
+---
+title: "Exercise 1 Bivariate"
+output: html_document
+---
+
+```{r lolliplot chart, echo=TRUE}
+link="https://github.com/EvansDataScience/data/raw/master/crime.RData"
+load(file = url(link))
+(CrimeTotal=table(crime$crimecat,crime$Occurred.DayTime))
+library(magrittr)
+(CrimeTotal=table(crime$crimecat,crime$Occurred.DayTime)%>% #create table and then...
+        prop.table() %>% #compute proportion and then...
+        "*"(100)%>% # multiply by 100 and then...
+        round(2) #...round to to decimals
+        )
+CrimeCol=table(crime$crimecat,crime$Occurred.DayTime)%>%
+         prop.table(margin = 2)%>%   # 2 is % by column
+         "*"(100)%>%
+         round(3)
+
+df.C=as.data.frame(CrimeCol)
+colnames(df.C)=c('Crime','Daytime','Percent')
+library(ggplot2)
+titleText='Crimes committed in Seattle depending on daytime'
+sourceText='Source: Seattle Police'
+df.C$Crime = reorder(df.C$Crime, df.C$Percent)
+ggplot(df.C, aes(x= Crime, y=Percent)) + geom_segment(aes(x = Crime, y = 0,  
+                                   yend = Percent, 
+                                   xend = Crime), color = "grey50") + geom_point() + coord_flip() + facet_wrap( ~ Daytime ,nrow = 1) + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+```
+
